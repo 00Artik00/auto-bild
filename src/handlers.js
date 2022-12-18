@@ -1,7 +1,12 @@
 import { diffDates, diffToHtml } from "./datecalc.js";
 import { formatError } from "./utils.js";
+
 const dateCalcResult = document.getElementById("datecalc__result");
 const timerResult = document.getElementById('timer__result');
+const stopButton = document.querySelector('.stopTimer');
+const startButton = document.querySelector('.startTimer');
+let startTime = 0;
+let timer = 1;
 export function handleCalcDates(event) {
     dateCalcResult.innerHTML = "";
     event.preventDefault();
@@ -21,46 +26,51 @@ export function handleCalcDates(event) {
 export function handleTimer(event) {
     event.preventDefault();
 
-    let { dateTo, time } = event.target;
+    let { dateTo, time } = event.target.elements;
     time = time.value;
-    dateTo = dateTo.value + "T" + time;
-
+    dateTo = dateTo.value;
     if (dateTo && time) {
-        const stopButton = document.querySelector('.stopTimer');
-        const startButton = document.querySelector('.startTimer');
-        stopButton.disabled = false;
+        dateTo += "T" + time;
+
+        if (!startTime) {
+            startTime = new Date().valueOf();
+        }
 
 
-        const timer = setInterval(() => {
-            console.log(`original timer: ${timer}`)
-            const currentTime = new Date().toISOString();
-            const diff = diffDates(currentTime, dateTo, false);
+        let diff = diffDates(new Date(startTime).toISOString(), dateTo, false);
+        if (!diff.error) {
+            stopButton.disabled = false;
+            startButton.disabled = true;
+            timerResult.innerHTML = diffToHtml(diff);
+            timer = setInterval(() => {
+                startTime += 1000;
+                diff = diffDates(new Date(startTime).toISOString(), dateTo, false);
 
-            if (!diff.error) {
                 if (diff.years + diff.months + diff.days + diff.hours + diff.minutes + Math.trunc(diff.seconds) !== 0) {
                     timerResult.innerHTML = diffToHtml(diff);
-                } else {
 
+                } else {
                     timerResult.innerHTML = 'Таймер закончился';
                     clearInterval(timer);
+                    const sound = new Howl({
+                        src: ['../sound/sound.mp3']
+                    });
+
+                    sound.play();
                 }
-            } else {
-                timerResult.innerHTML = formatError("Выберете время в будущем а не в прошлом");
-                clearInterval(timer);
-            }
-
-
-        }, 1000);
-        stopButton.addEventListener('click', () => {
-            stopTimer(timer);
-        })
+            }, 1000)
+        } else {
+            timerResult.innerHTML = formatError("Выберете время в будущем а не в прошлом");
+        }
     } else {
         timerResult.innerHTML = formatError("Выберете дату и время");
     }
 
 
 }
-function stopTimer(timer) {
-    console.log('try to stop, timer = ' + timer)
+export function stopTimer(event) {
+    event.preventDefault();
+    startButton.disabled = false;
+    stopButton.disabled = true;
     clearInterval(timer);
 }
