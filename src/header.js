@@ -1,5 +1,6 @@
 
 const headerButtons = document.querySelectorAll('.header button');
+//Назначение обработчики для каждой кнопки в шапке сайта
 for (const button of headerButtons) {
     button.addEventListener('click', (event) => {
         headerButtons.forEach(el => {

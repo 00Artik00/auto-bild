@@ -5,8 +5,18 @@ const dateCalcResult = document.getElementById("datecalc__result");
 const timerResult = document.getElementById('timer__result');
 const stopButton = document.querySelector('.stopTimer');
 const startButton = document.querySelector('.startTimer');
+/* Переменная, которая отвечает за то, с какой милисекунды прошедшей с 1 января
+ 1970 г.UTC необходимо начать отсчет для таймера */
 let startTime = 0;
+// Номер таймера, который необходимо выключить
 let timer = 1;
+
+/**
+ * Функция обработчик, для кнопки расчитать промежуток. Забирает значения первой
+ * и второй даты из полей инпута, после чего сравнивает их и выводит результат
+ * на экран
+ * @param {object} event object event
+ */
 export function handleCalcDates(event) {
     dateCalcResult.innerHTML = "";
     event.preventDefault();
@@ -22,7 +32,13 @@ export function handleCalcDates(event) {
     }
     else dateCalcResult.innerHTML = formatError("Для расчета промежутка необходимо заполнить оба поля");
 }
-
+/**
+ * Функция обработчик для кнопки Запустить таймер. Забирает значение времени из
+ * инпутов, после сравнивает его с текущим и выводит на экран разницу. Время 
+ * начала таймера сохраняется в глобальную переменную, чтобы впоследствие ей можно
+ * было воспользоваться для повторного включения таймера.
+ * @param {*} event 
+ */
 export function handleTimer(event) {
     event.preventDefault();
 
@@ -68,6 +84,10 @@ export function handleTimer(event) {
 
 
 }
+/**
+ * Обработчик для кнопки остановить таймер
+ * @param {*} event 
+ */
 export function stopTimer(event) {
     event.preventDefault();
     startButton.disabled = false;
